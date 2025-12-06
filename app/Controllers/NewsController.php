@@ -52,8 +52,10 @@ class NewsController
             $count = $res['count'];
             $this->redis->setex($cacheKey, 300, $count);
         }
-
         $pages = ceil($count / 10);
+
+        $cacheKey = 'news:views:page_' . $page;
+        $viewsCount = $this->redis->incr($cacheKey);
 
         $view = Twig::fromRequest($request);
     
@@ -61,7 +63,8 @@ class NewsController
             'news' => $news,
             'pages' => $pages,
             'current_page' => $page,
-            'message' => $message
+            'message' => $message,
+            'views' => $viewsCount,
         ]);
     }
 }

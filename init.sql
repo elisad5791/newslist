@@ -45,12 +45,11 @@ CREATE TABLE users_likes (
     CONSTRAINT unique_user_news UNIQUE (user_id, news_id)
 ) ENGINE=InnoDB;
 
-CREATE TABLE news_views ( 
+CREATE TABLE pages_views ( 
 	id INT PRIMARY KEY AUTO_INCREMENT,
-	news_id INT,
+	page_id INT,
 	views INT,
-    CONSTRAINT users_likes_news_id_fkey FOREIGN KEY (news_id) REFERENCES news(id),
-    CONSTRAINT unique_news UNIQUE (news_id)
+    CONSTRAINT unique_page UNIQUE (page_id)
 ) ENGINE=InnoDB;
 
 INSERT INTO categories VALUES

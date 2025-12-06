@@ -135,6 +135,35 @@ p {
     border-color: #3498db;
 }
 
+/* Счетчик просмотров */
+.views-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-radius: 20px;
+    align-self: flex-start;
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.views-icon {
+    width: 18px;
+    height: 18px;
+    color: #3498db;
+    flex-shrink: 0;
+}
+
+.views-count {
+    font-weight: 600;
+    color: #2c3e50;
+    font-feature-settings: "tnum";
+    font-variant-numeric: tabular-nums;
+}
+
 /* Анимация появления карточек */
 @keyframes fadeInUp {
     from {
