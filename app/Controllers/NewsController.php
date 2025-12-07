@@ -17,6 +17,7 @@ class NewsController
     {
         $this->pdo = $pdo;
         $this->redis = $redis; 
+        session_start();
     } 
 
     public function index(Request $request, Response $response, $args) 
@@ -57,6 +58,8 @@ class NewsController
         $cacheKey = 'news:views:page_' . $page;
         $viewsCount = $this->redis->incr($cacheKey);
 
+        $username = $_SESSION['username'] ?? '';
+
         $view = Twig::fromRequest($request);
     
         return $view->render($response, 'news.html.twig', [
@@ -65,6 +68,7 @@ class NewsController
             'current_page' => $page,
             'message' => $message,
             'views' => $viewsCount,
+            'username' => $username,
         ]);
     }
 }

@@ -6,7 +6,16 @@
 </head>
 <body>
 
-<h1>News List ({{ message }})</h1>
+<header>
+    <h1>News List ({{ message }})</h1>
+    <div class="login">
+        {% if username %}
+            <span>{{ username }}</span>
+        {% else %}
+            <a href="/auth" class="login-link">Войти</a>
+        {% endif %}
+    </div>
+</header>
 
 <div class="container">
     {% for item in news %}
