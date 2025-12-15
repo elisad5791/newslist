@@ -1,12 +1,13 @@
 <?php
 
+use App\Middleware\CounterMiddleware;
+use App\Services\UserService;
 use DI\Container;
+use Psr\Container\ContainerInterface;
 
 $container = new Container ();
 
 $settings = require __DIR__ . '/../config/settings.php';
-
-/*$container->set('settings', $settings);*/
 
 $container->set(PDO::class, function () use ($settings) {
     $host = $settings['database']['host'];
@@ -37,6 +38,16 @@ $container->set(Redis::class, function () use ($settings) {
     $redis->auth($password);
 
     return $redis;
+});
+
+$container->set(UserService::class, function (ContainerInterface $container) {
+    $userService = new UserService($container->get(Redis::class));
+    return $userService;
+});
+
+$container->set(CounterMiddleware::class, function (ContainerInterface $container) {
+    $counterMiddleware = new CounterMiddleware($container->get(UserService::class));
+    return $counterMiddleware;
 });
 
 return $container;

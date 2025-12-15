@@ -4,6 +4,7 @@ use App\Controllers\NewsController;
 use App\Controllers\AuthController;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
+use App\Middleware\CounterMiddleware;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -21,6 +22,7 @@ $app = AppFactory::create();
 
 $twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
 $app->add(TwigMiddleware::create($app, $twig));
+$app->add(CounterMiddleware::class);
 
 $app->get('/', [NewsController::class, 'index']);
 $app->get('/news/{id}', [NewsController::class, 'showNews']);
