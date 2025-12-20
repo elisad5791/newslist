@@ -1,6 +1,7 @@
 <?php
 
 use App\Middleware\CounterMiddleware;
+use App\Middleware\UserActivityMiddleware;
 use App\Services\LikeService;
 use App\Services\UserService;
 use DI\Container;
@@ -49,6 +50,11 @@ $container->set(UserService::class, function (ContainerInterface $container) {
 $container->set(CounterMiddleware::class, function (ContainerInterface $container) {
     $counterMiddleware = new CounterMiddleware($container->get(UserService::class));
     return $counterMiddleware;
+});
+
+$container->set(UserActivityMiddleware::class, function (ContainerInterface $container) {
+    $userActivityMiddleware = new UserActivityMiddleware($container->get(Redis::class));
+    return $userActivityMiddleware;
 });
 
 $container->set(LikeService::class, function (ContainerInterface $container) {

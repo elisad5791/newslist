@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Services\UserService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use PDO;
@@ -13,11 +14,13 @@ class NewsController
     const NEWS_FOR_PAGE = 9;
     protected $pdo;
     protected $redis;
+    protected $userService;
 
-    public function __construct(PDO $pdo, Redis $redis)
+    public function __construct(PDO $pdo, Redis $redis, UserService $userService)
     {
         $this->pdo = $pdo;
         $this->redis = $redis; 
+        $this->userService = $userService;
         session_start();
     } 
 
@@ -109,6 +112,8 @@ class NewsController
 
         $username = $_SESSION['username'] ?? '';
 
+        $activeUsers = $this->userService->getActiveCount();
+
         $view = Twig::fromRequest($request);
     
         return $view->render($response, 'news.html.twig', [
@@ -117,7 +122,8 @@ class NewsController
             'current_page' => $page,
             'message' => $message,
             'username' => $username,
-            'popular' => $popular
+            'popular' => $popular,
+            'active_users' => $activeUsers
         ]);
     }
 
@@ -168,6 +174,21 @@ class NewsController
         $viewsCount = $this->redis->zincrby('news:top', 1, $newsId);
 
         $username = $_SESSION['username'] ?? '';
+        $userId = $_SESSION['userid'] ?? 0;
+        $activeUsers = $this->userService->getActiveCount();
+
+        $like = false;
+        if (!empty($userId)) {
+            $cacheKey = "likes:user_$userId";
+            $likes = $this->redis->sMembers($cacheKey);
+            $like = in_array($newsId, $likes);
+        }
+
+        $cacheKey = 'likes:news';
+        $likeCount = $this->redis->hGet($cacheKey, $newsId);
+        if (empty($likeCount)) {
+            $likeCount = 0;
+        }
 
         $view = Twig::fromRequest($request);
     
@@ -176,6 +197,9 @@ class NewsController
             'views' => $viewsCount,
             'username' => $username,
             'message' => $message,
+            'active_users' => $activeUsers,
+            'like' => $like,
+            'like_count' => $likeCount,
         ]);
     }
 
@@ -217,6 +241,8 @@ class NewsController
 
         $username = $_SESSION['username'] ?? '';
 
+        $activeUsers = $this->userService->getActiveCount();
+
         $view = Twig::fromRequest($request);
     
         return $view->render($response, 'category.html.twig', [
@@ -224,6 +250,7 @@ class NewsController
             'message' => $message,
             'username' => $username,
             'title' => $categoryTitle,
+            'active_users' => $activeUsers,
         ]);
     }
 
@@ -268,6 +295,7 @@ class NewsController
         }
 
         $username = $_SESSION['username'] ?? '';
+        $activeUsers = $this->userService->getActiveCount();
 
         $view = Twig::fromRequest($request);
     
@@ -276,6 +304,7 @@ class NewsController
             'message' => $message,
             'username' => $username,
             'title' => $tagTitle,
+            'active_users' => $activeUsers,
         ]);
     }
 }

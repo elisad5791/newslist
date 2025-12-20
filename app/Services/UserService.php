@@ -34,4 +34,26 @@ class UserService
             return 0;
         }
     }
+
+    public function getActiveCount()
+    {
+        $setKey = 'active_users';
+        
+        $this->cleanDeadUsers();
+        $onlineCount = $this->redis->sCard($setKey);        
+        
+        return $onlineCount;
+    }
+
+    protected function cleanDeadUsers()
+    {
+        $allUsers = $this->redis->sMembers('active_users');
+    
+        foreach ($allUsers as $userId) {
+            $userKey = "user_active:$userId";
+            if (!$this->redis->exists($userKey)) {
+                $this->redis->sRem('active_users', $userId);
+            }
+        }
+    }
 }

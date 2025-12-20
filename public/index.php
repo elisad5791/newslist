@@ -1,5 +1,6 @@
 <?php
 use App\Middleware\JsonBodyParserMiddleware;
+use App\Middleware\UserActivityMiddleware;
 use Slim\Factory\AppFactory;
 use App\Controllers\NewsController;
 use App\Controllers\AuthController;
@@ -24,6 +25,7 @@ $app = AppFactory::create();
 
 $app->add(CounterMiddleware::class);
 $app->add(JsonBodyParserMiddleware::class);
+$app->add(UserActivityMiddleware::class);
 
 $twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
 $app->add(TwigMiddleware::create($app, $twig));
@@ -36,5 +38,6 @@ $app->get('/auth', [AuthController::class, 'index']);
 
 $app->post('/submit-name', [AuthController::class, 'submitName']);
 $app->post('/add-like', [LikeController::class, 'addLike']);
+$app->post('/remove-like', [LikeController::class, 'removeLike']);
 
 $app->run();

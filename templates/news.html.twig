@@ -15,6 +15,9 @@
             <a href="/auth" class="login-link">Войти</a>
         {% endif %}
     </div>
+    <div class="active-users">
+        Active Users: {{ active_users }}
+    </div>
 </header>
 
 <div class="wrapper">
@@ -63,6 +66,5 @@
     {% endfor %}
 </div>
 
-<script src="/script.js"></script>
 </body>
 </html>
