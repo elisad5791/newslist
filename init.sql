@@ -52,6 +52,12 @@ CREATE TABLE news_views (
     CONSTRAINT unique_news UNIQUE (news_id)
 ) ENGINE=InnoDB;
 
+CREATE TABLE like_logs ( 
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	message TEXT NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
 INSERT INTO categories VALUES
 (1,'laboriosam'),
 (2,'consequatur'),

@@ -53,8 +53,8 @@ class AuthController
         
         $_SESSION['username'] = $name;
         $_SESSION['userid'] = $userId;
-        $cacheKey = 'news:likes:user_' . $userId;
-        $this->redis->sAdd($cacheKey, ...$likes);
+        /*$cacheKey = 'news:likes:user_' . $userId;
+        $this->redis->sAdd($cacheKey, ...$likes);*/
         
         return $response->withHeader('Location', '/')->withStatus(302);
     }

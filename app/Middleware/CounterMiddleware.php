@@ -21,7 +21,7 @@ class CounterMiddleware implements Middleware
         $ip = $request->getServerParams()['REMOTE_ADDR'] ?? null;
         $counter = $this->userService->checkRequestRate($ip);
 
-        if ($counter > 10 || $counter == 0) {
+        if ($counter > 60 || $counter == 0) {
             $response = new \Slim\Psr7\Response();
             $response->getBody()->write('Request rejected');
             return $response->withStatus(429);

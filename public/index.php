@@ -1,7 +1,9 @@
 <?php
+use App\Middleware\JsonBodyParserMiddleware;
 use Slim\Factory\AppFactory;
 use App\Controllers\NewsController;
 use App\Controllers\AuthController;
+use App\Controllers\LikeController;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use App\Middleware\CounterMiddleware;
@@ -20,15 +22,19 @@ $container = require __DIR__ . '/../bootstrap/dependencies.php';
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 
+$app->add(CounterMiddleware::class);
+$app->add(JsonBodyParserMiddleware::class);
+
 $twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
 $app->add(TwigMiddleware::create($app, $twig));
-$app->add(CounterMiddleware::class);
 
 $app->get('/', [NewsController::class, 'index']);
 $app->get('/news/{id}', [NewsController::class, 'showNews']);
 $app->get('/category/{id}', [NewsController::class, 'showCategory']);
 $app->get('/tag/{id}', [NewsController::class, 'showTag']);
 $app->get('/auth', [AuthController::class, 'index']);
+
 $app->post('/submit-name', [AuthController::class, 'submitName']);
+$app->post('/add-like', [LikeController::class, 'addLike']);
 
 $app->run();
