@@ -23,6 +23,18 @@
 </div>
 
 <div class="item-container">
+    {% if tag_similar %}
+        <div class="item-similar-tag">
+            <h2>Similar News</h2>
+            {% for news in tag_similar %}
+                <div class="popular-item">
+                    <small>{{ news.created_at }}</small>
+                    <a href="/news/{{ news.id }}" class="news-title">{{ news.title }}</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div class="item">
         <div class="item-subtitle">
             <small>{{ item.created_at }}</small>
@@ -80,6 +92,18 @@
             </form>
         {% endif %}
     </div>
+
+    {% if category_similar %}
+        <div class="item-similar-category">
+            <h2>{{ category_similar[0].category_title }}</h2>
+            {% for news in category_similar %}
+                <div class="popular-item">
+                    <small>{{ news.created_at }}</small>
+                    <a href="/news/{{ news.id }}" class="news-title">{{ news.title }}</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>
 
 </body>

@@ -190,6 +190,69 @@ class NewsController
             $likeCount = 0;
         }
 
+        $cacheKey = "tag:similar:news_$newsId";
+        $data = $this->redis->zRevRange($cacheKey, 0, -1);
+        if (!empty($data)) {
+            $tagSimilar = [];
+            foreach ($data as $news) {
+                $tagSimilar[] = json_decode($news, true);
+            }
+        } else {
+            $sql = "SELECT nt2.news_id, COUNT(*) as common_tags
+                FROM news_tags nt1
+                JOIN news_tags nt2 ON nt2.tag_id = nt1.tag_id
+                WHERE nt1.news_id = ? AND nt2.news_id != ?
+                GROUP BY nt2.news_id
+                HAVING common_tags > 0
+                ORDER BY common_tags DESC
+                LIMIT 5";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$newsId, $newsId]);
+            $data = $stmt->fetchAll();
+            $ids = array_column($data, 'news_id');
+            $counts = array_column($data, 'common_tags', 'news_id');
+
+            $placeholders = str_repeat('?,', count($ids) - 1) . '?';
+            $orderField = 'FIELD(id, ' . str_repeat('?,', count($ids) - 1) . '?)';
+            $sql = "SELECT id, title, created_at 
+                FROM news 
+                WHERE id IN ($placeholders) 
+                ORDER BY $orderField";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([...$ids, ...$ids]);
+            $tagSimilar = $stmt->fetchAll();
+
+            foreach ($tagSimilar as $news) {
+                $val = json_encode($news);
+                $this->redis->zAdd($cacheKey, $counts[$news['id']], $val);
+            }
+        }
+
+        $cacheKey = "category:similar:news_$newsId";
+        $data = $this->redis->sMembers($cacheKey);
+        if (!empty($data)) {
+            $categorySimilar = [];
+            foreach ($data as $news) {
+                $categorySimilar[] = json_decode($news, true);
+            }
+        } else {
+            $sql = "SELECT n2.id, n2.title, n2.created_at, c.title AS category_title
+                FROM news n1
+                JOIN news n2 ON n2.category_id = n1.category_id AND n2.id != n1.id
+                LEFT JOIN categories c ON c.id = n1.category_id
+                WHERE n1.id = ?
+                ORDER BY n2.created_at DESC
+                LIMIT 5";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$newsId]);
+            $categorySimilar = $stmt->fetchAll();
+
+            foreach ($categorySimilar as $news) {
+                $val = json_encode($news);
+                $this->redis->zAdd($cacheKey, $counts[$news['id']], $val);
+            }
+        }
+
         $view = Twig::fromRequest($request);
     
         return $view->render($response, 'item.html.twig', [
@@ -200,6 +263,8 @@ class NewsController
             'active_users' => $activeUsers,
             'like' => $like,
             'like_count' => $likeCount,
+            'tag_similar' => $tagSimilar,
+            'category_similar' => $categorySimilar,
         ]);
     }
 

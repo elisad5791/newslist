@@ -334,12 +334,22 @@ p {
 
 /* Страница новости */
 .item-container {
-    max-width: 800px;
-    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
     padding: 0 20px;
 }
 
+.item-similar-tag {
+    grid-column: 1/2;
+}
+
+.item-similar-category {
+    grid-column: 4/5;
+}
+
 .item {
+    grid-column: 2/4;
     background-color: white;
     border-radius: 8px;
     padding: 30px;
