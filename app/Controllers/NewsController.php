@@ -111,8 +111,18 @@ class NewsController
         }
 
         $username = $_SESSION['username'] ?? '';
-
+        $userId = $_SESSION['userid'] ?? 0;
+        
         $activeUsers = $this->userService->getActiveCount();
+
+        $recently = [];
+        if (!empty($userId)) {
+            $cacheKey = "recent:user_{$userId}";
+            $data = $this->redis->lRange($cacheKey, 0, -1);
+            foreach ($data as $item) {
+                $recently[] = json_decode($item, true);
+            }
+        }
 
         $view = Twig::fromRequest($request);
     
@@ -123,7 +133,8 @@ class NewsController
             'message' => $message,
             'username' => $username,
             'popular' => $popular,
-            'active_users' => $activeUsers
+            'active_users' => $activeUsers,
+            'recently' => $recently,
         ]);
     }
 
@@ -253,6 +264,18 @@ class NewsController
             }
         }
 
+        if (!empty($userId)) {
+            $key = "recent:user_{$userId}";
+            $shortItem = [
+                'id' => $item['id'],
+                'title' => $item['title'],
+                'created_at' => $item['created_at'],
+            ];
+            $val = json_encode($shortItem);
+            $this->redis->lPush($key, $val);
+            $this->redis->lTrim($key, 0, 4);
+        }
+          
         $view = Twig::fromRequest($request);
     
         return $view->render($response, 'item.html.twig', [
