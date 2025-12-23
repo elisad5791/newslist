@@ -204,4 +204,16 @@ class NewsRedisHelper
         $cacheKey = "item:news_$newsId";
         $this->redis->set($cacheKey, json_encode($item));
     }
+
+    public function getViewsKeys()
+    {
+        $keys = $this->redis->keys('views:news_*');
+        return $keys;
+    }
+
+    public function getKey($key)
+    {
+        $val = (int) $this->redis->get($key);
+        return $val;
+    }
 }

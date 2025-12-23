@@ -9,12 +9,9 @@ use App\Services\UserService;
 
 class CounterMiddleware implements Middleware
 {
-    protected $userService;
-
-    public function __construct(UserService $userService)
-    {
-        $this->userService = $userService;
-    }
+    public function __construct(
+        protected UserService $userService
+    ) {}
 
     public function process(Request $request, RequestHandler $handler): Response
     {

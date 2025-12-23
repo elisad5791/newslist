@@ -1,10 +1,5 @@
 <?php
-
-use App\Middleware\CounterMiddleware;
-use App\Middleware\UserActivityMiddleware;
-use App\Services\UserService;
 use DI\Container;
-use Psr\Container\ContainerInterface;
 
 $container = new Container ();
 
@@ -39,16 +34,6 @@ $container->set(Redis::class, function () use ($settings) {
     $redis->auth($password);
 
     return $redis;
-});
-
-$container->set(CounterMiddleware::class, function (ContainerInterface $container) {
-    $counterMiddleware = new CounterMiddleware($container->get(UserService::class));
-    return $counterMiddleware;
-});
-
-$container->set(UserActivityMiddleware::class, function (ContainerInterface $container) {
-    $userActivityMiddleware = new UserActivityMiddleware($container->get(Redis::class));
-    return $userActivityMiddleware;
 });
 
 return $container;

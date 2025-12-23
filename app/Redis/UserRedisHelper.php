@@ -75,4 +75,13 @@ class UserRedisHelper
         $dataJson = $this->redis->brPop('queue_like', 0);
         return $dataJson;
     }
+
+    public function trackUserActivity($userId)
+    {
+        $userKey = "user_active:{$userId}";
+        $this->redis->setex($userKey, 300, 'active');
+        $setKey = "active_users";
+        $this->redis->sAdd($setKey, $userId);
+        $this->redis->expire($setKey, 300);
+    }
 }

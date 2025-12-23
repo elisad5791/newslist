@@ -25,4 +25,9 @@ class UserService
         $onlineCount = $this->userRedisHelper->getOnlineCount();
         return $onlineCount;
     }
+
+    public function trackUserActivity($userId)
+    {
+        $this->userRedisHelper->trackUserActivity($userId);
+    }
 }

@@ -173,4 +173,25 @@ class NewsRepository
 
         return $item;
     }
+
+    public function updateViews($data)
+    {
+        $sql = "TRUNCATE TABLE news_views";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+
+        $values = [];
+        $params = [];
+
+        foreach ($data as $item) {
+            $values[] = "(?, ?)";
+            $params[] = $item['id'];
+            $params[] = $item['views'];
+        }
+
+        $sql = "INSERT INTO news_views (news_id, views) VALUES " . implode(", ", $values);
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+    }
 }

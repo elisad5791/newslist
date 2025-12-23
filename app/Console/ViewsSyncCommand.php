@@ -2,25 +2,20 @@
 
 namespace App\Console;
 
+use App\Redis\NewsRedisHelper;
+use App\Repositories\NewsRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Attribute\AsCommand;
-use PDO;
-use Redis;
 
 #[AsCommand(name: 'views:sync', description: 'Перенос данных просмотров из Redis в MySQL')]
 class ViewsSyncCommand extends Command
 {
-    protected $pdo;
-    protected $redis;
-
-    public function __construct(PDO $pdo, Redis $redis)
+    public function __construct(protected NewsRepository $newsRepository, protected NewsRedisHelper $newsRedisHelper)
     {
         parent::__construct();
-        $this->pdo = $pdo;
-        $this->redis = $redis;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -30,7 +25,7 @@ class ViewsSyncCommand extends Command
         try {
             $io->title('Синхронизация просмотров из Redis в MySQL');
             
-            $keys = $this->redis->keys('views:news_*');
+            $keys = $this->newsRedisHelper->getViewsKeys();
             
             if (empty($keys)) {
                 $io->success('Нет данных для синхронизации');
@@ -42,14 +37,16 @@ class ViewsSyncCommand extends Command
             $data = [];
             foreach ($keys as $key) {
                 $newsId = str_replace('views:news_', '', $key);
-                $viewsCount = (int) $this->redis->get($key);
+                $viewsCount = $this->newsRedisHelper->getKey($key);
                 
                 if ($viewsCount > 0) {
                     $data[] = ['id' => $newsId, 'views' => $viewsCount];
                 }
             }
 
-            $this->updateViews($data);
+            if (empty($data)) {
+                $this->newsRepository->updateViews($data);
+            }
             
             $io->success('Синхронизация завершена.');
             return Command::SUCCESS;
@@ -57,30 +54,5 @@ class ViewsSyncCommand extends Command
             $io->error('Критическая ошибка: ' . $e->getMessage());
             return Command::FAILURE;
         }
-    }
-    
-    private function updateViews($data): void
-    {
-        if (empty($data)) {
-            return;
-        }
-
-        $sql = "TRUNCATE TABLE news_views";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-
-        $values = [];
-        $params = [];
-
-        foreach ($data as $item) {
-            $values[] = "(?, ?)";
-            $params[] = $item['id'];
-            $params[] = $item['views'];
-        }
-
-        $sql = "INSERT INTO news_views (news_id, views) VALUES " . implode(", ", $values);
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
     }
 }
