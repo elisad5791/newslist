@@ -10,9 +10,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Views\Twig;
 
 class NewsController
-{   
-    
-
+{
     public function __construct(
         protected UserService $userService,
         protected NewsService $newsService,

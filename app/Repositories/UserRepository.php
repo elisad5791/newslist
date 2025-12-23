@@ -63,4 +63,12 @@ class UserRepository
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$userId, $newsId]);
     }
+
+    public function addLog($userId, $newsId)
+    {
+        $message = "User $userId add like to news $newsId";
+        $sql = "INSERT INTO like_logs(message) VALUES(?)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$message]);
+    }
 }

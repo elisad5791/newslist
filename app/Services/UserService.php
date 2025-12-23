@@ -1,17 +1,13 @@
 <?php
 namespace App\Services;
 
-use Exception;
-use Redis;
+use App\Redis\UserRedisHelper;
 
 class UserService
 {
-    protected $redis;
-
-    public function __construct(Redis $redis)
-    {
-        $this->redis = $redis;
-    }
+    public function __construct(
+        protected UserRedisHelper $userRedisHelper
+    ) {}
     
     public function checkRequestRate($ip)
     {
@@ -19,41 +15,14 @@ class UserService
             return 0;
         }
 
-        try {
-            $key = "rate_limit:$ip";
-            $now = microtime(true);
-            $windowStart = $now - 60;
-
-            $this->redis->zremrangebyscore($key, 0, $windowStart);
-            $this->redis->zadd($key, $now, $now);
-            $this->redis->expire($key, 61);
-            $count = $this->redis->zcount($key, $windowStart, $now);
-
-            return $count;
-        } catch (Exception $e) {
-            return 0;
-        }
+        $count = $this->userRedisHelper->getRequestCount($ip);
+        return $count;
     }
 
     public function getActiveCount()
     {
-        $setKey = 'active_users';
-        
-        $this->cleanDeadUsers();
-        $onlineCount = $this->redis->sCard($setKey);        
-        
+        $this->userRedisHelper->cleanDeadUsers();
+        $onlineCount = $this->userRedisHelper->getOnlineCount();
         return $onlineCount;
-    }
-
-    protected function cleanDeadUsers()
-    {
-        $allUsers = $this->redis->sMembers('active_users');
-    
-        foreach ($allUsers as $userId) {
-            $userKey = "user_active:$userId";
-            if (!$this->redis->exists($userKey)) {
-                $this->redis->sRem('active_users', $userId);
-            }
-        }
     }
 }

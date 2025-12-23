@@ -2,7 +2,6 @@
 
 use App\Middleware\CounterMiddleware;
 use App\Middleware\UserActivityMiddleware;
-use App\Services\LikeService;
 use App\Services\UserService;
 use DI\Container;
 use Psr\Container\ContainerInterface;
@@ -40,11 +39,6 @@ $container->set(Redis::class, function () use ($settings) {
     $redis->auth($password);
 
     return $redis;
-});
-
-$container->set(UserService::class, function (ContainerInterface $container) {
-    $userService = new UserService($container->get(Redis::class));
-    return $userService;
 });
 
 $container->set(CounterMiddleware::class, function (ContainerInterface $container) {

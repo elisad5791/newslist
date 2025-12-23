@@ -36,4 +36,43 @@ class UserRedisHelper
         $cacheKey = 'likes:news';
         $this->redis->hIncrBy($cacheKey, $newsId, -1);
     }
+
+    public function getRequestCount($ip)
+    {
+        $key = "rate_limit:$ip";
+        $now = microtime(true);
+        $windowStart = $now - 60;
+
+        $this->redis->zremrangebyscore($key, 0, $windowStart);
+        $this->redis->zadd($key, $now, $now);
+        $this->redis->expire($key, 61);
+        $count = $this->redis->zcount($key, $windowStart, $now);
+
+        return $count;
+    }
+
+    public function cleanDeadUsers()
+    {
+        $allUsers = $this->redis->sMembers('active_users');
+    
+        foreach ($allUsers as $userId) {
+            $userKey = "user_active:$userId";
+            if (!$this->redis->exists($userKey)) {
+                $this->redis->sRem('active_users', $userId);
+            }
+        }
+    }
+
+    public function getOnlineCount()
+    {
+        $setKey = 'active_users';
+        $onlineCount = $this->redis->sCard($setKey); 
+        return $onlineCount;
+    }
+
+    public function getQueueTask()
+    {
+        $dataJson = $this->redis->brPop('queue_like', 0);
+        return $dataJson;
+    }
 }
