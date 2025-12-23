@@ -11,7 +11,7 @@ class SessionHelper
     
     public function setValues($data)
     {
-        foreach($data as $item) {
+        foreach ($data as $item) {
             $_SESSION[$item['key']] = $item['value'];
         }
     }
@@ -20,5 +20,11 @@ class SessionHelper
     {
         $userId = $_SESSION['userid'] ?? 0;
         return $userId;
+    }
+
+    public function getUsername()
+    {
+        $username = $_SESSION['username'] ?? '';
+        return $username;
     }
 }
