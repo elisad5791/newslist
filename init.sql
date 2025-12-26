@@ -49,6 +49,7 @@ CREATE TABLE news_views (
 	id INT PRIMARY KEY AUTO_INCREMENT,
 	news_id INT,
 	views INT,
+	CONSTRAINT views_news_id_fkey FOREIGN KEY (news_id) REFERENCES news(id),
     CONSTRAINT unique_news UNIQUE (news_id)
 ) ENGINE=InnoDB;
 
