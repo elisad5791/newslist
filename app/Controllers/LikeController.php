@@ -14,7 +14,7 @@ class LikeController
         protected LikeService $likeService,
     ) {}
     
-    public function addLike(Request $request, Response $response)
+    public function addLike(Request $request, Response $response): Response
     {
         $params = $request->getParsedBody();
         $newsId = (int) $params['news'];
@@ -29,7 +29,7 @@ class LikeController
         return $response->withHeader('Location', "/news/$newsId")->withStatus(302);
     }
 
-    public function removeLike(Request $request, Response $response)
+    public function removeLike(Request $request, Response $response): Response
     {
         $params = $request->getParsedBody();
         $newsId = (int) $params['news'];

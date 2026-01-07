@@ -13,14 +13,14 @@ class AuthController
         protected AuthService $authService
     ) {}
 
-    public function index(Request $request, Response $response, $args) 
+    public function index(Request $request, Response $response, $args): Response 
     {
         $view = Twig::fromRequest($request);
     
         return $view->render($response, 'auth.html.twig');
     }
 
-    public function submitName(Request $request, Response $response, $args)
+    public function submitName(Request $request, Response $response, $args): Response
     {
         $params = (array) $request->getParsedBody();
         $name = htmlspecialchars($params['name']);

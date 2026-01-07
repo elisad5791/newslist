@@ -11,7 +11,7 @@ class LikeService
         protected UserRedisHelper $userRedisHelper
     ) {}
 
-    public function addLike($userId, $newsId)
+    public function addLike(int $userId, int $newsId): void
     {
         $like = $this->userRepository->getLike($userId, $newsId);
         if (!empty($like)) {
@@ -22,7 +22,7 @@ class LikeService
         $this->userRedisHelper->addLike($userId, $newsId);
     }
 
-    public function removeLike($userId, $newsId)
+    public function removeLike(int $userId, int $newsId): void
     {
         $like = $this->userRepository->getLike($userId, $newsId);
         if (empty($like)) {

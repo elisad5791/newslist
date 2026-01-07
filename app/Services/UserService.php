@@ -9,7 +9,7 @@ class UserService
         protected UserRedisHelper $userRedisHelper
     ) {}
     
-    public function checkRequestRate($ip)
+    public function checkRequestRate(string $ip): int
     {
         if (empty($ip)) {
             return 0;
@@ -19,7 +19,7 @@ class UserService
         return $count;
     }
 
-    public function getActiveCount()
+    public function getActiveCount(): int
     {
         $this->userRedisHelper->cleanDeadUsers();
         $onlineCount = $this->userRedisHelper->getOnlineCount();

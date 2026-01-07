@@ -14,7 +14,7 @@ class NewsService
         protected NewsRedisHelper $newsRedisHelper
     ) {}
 
-    public function getTagData($tagId)
+    public function getTagData(int $tagId): array
     {
         $cachedNews = $this->newsRedisHelper->getTagNews($tagId);
         
@@ -40,7 +40,7 @@ class NewsService
         return $result;
     }
 
-    public function getCategoryData($categoryId)
+    public function getCategoryData(int $categoryId): array
     {
         $cachedNews = $this->newsRedisHelper->getCategoryNews($categoryId);
         
@@ -66,7 +66,7 @@ class NewsService
         return $result;
     }
 
-    public function getNewsPage($page)
+    public function getNewsPage(int $page): array
     { 
         $cachedNews = $this->newsRedisHelper->getNewsPage($page);
         $message = '';
@@ -104,7 +104,7 @@ class NewsService
         return $result;
     }
 
-    public function getPageCount()
+    public function getPageCount(): int
     {
         $cachedCount = $this->newsRedisHelper->getNewsCount();
         if ($cachedCount) {
@@ -118,7 +118,7 @@ class NewsService
         return $pages;
     }
 
-    public function getPopular()
+    public function getPopular(): array
     {
         $popularIds = $this->newsRedisHelper->getPopular();
         $popular = [];
@@ -173,7 +173,7 @@ class NewsService
         return $result;
     }
 
-    public function getNews($newsId)
+    public function getNews(int $newsId): array
     {
         $cachedItem = $this->newsRedisHelper->getNews($newsId);
         $message = '';
@@ -199,25 +199,25 @@ class NewsService
         return $result;
     }
 
-    public function getViewsCount($newsId)
+    public function getViewsCount(int $newsId): int
     {
         $viewsCount = $this->newsRedisHelper->getViewsCount($newsId);
         return $viewsCount;
     }
 
-    public function getCurrentLike($userId, $newsId)
+    public function getCurrentLike(int $userId, int $newsId): bool
     {
         $like = $this->newsRedisHelper->getCurrentLike($userId, $newsId);
         return $like;
     }
 
-    public function getLikeCount($newsId)
+    public function getLikeCount(int $newsId): int
     {
         $likeCount = $this->newsRedisHelper->getLikeCount($newsId);
         return $likeCount;
     }
 
-    public function getTagSimilar($newsId)
+    public function getTagSimilar(int $newsId): array
     {
         $data = $this->newsRedisHelper->getTagSimilar($newsId);
         if (!empty($data)) {
@@ -239,7 +239,7 @@ class NewsService
         return $tagSimilar;
     }
 
-    public function getCategorySimilar($newsId)
+    public function getCategorySimilar(int $newsId): array
     {
         $data = $this->newsRedisHelper->getCategorySimilar($newsId);
         if (!empty($data)) {

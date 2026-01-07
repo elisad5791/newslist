@@ -15,7 +15,7 @@ class AdminController
         protected AdminService $adminService,
     ) {}
 
-    public function index(Request $request, Response $response, $args) 
+    public function index(Request $request, Response $response, $args): Response
     {
         $activeUsers = $this->userService->getActiveCount();
         $dayUsers = $this->adminService->getLastDayUsers();

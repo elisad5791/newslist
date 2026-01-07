@@ -51,7 +51,7 @@ class NewsController
         ]);
     }
 
-    public function showNews(Request $request, Response $response, $args)
+    public function showNews(Request $request, Response $response, $args): Response
     {
         $newsId = (int) $args['id'];
 
@@ -89,7 +89,7 @@ class NewsController
         ]);
     }
 
-    public function showCategory(Request $request, Response $response, $args)
+    public function showCategory(Request $request, Response $response, $args): Response
     {
         $categoryId = (int) $args['id'];
 
@@ -110,7 +110,7 @@ class NewsController
         ]);
     }
 
-    public function showTag(Request $request, Response $response, $args)
+    public function showTag(Request $request, Response $response, $args): Response
     {
         $tagId = (int) $args['id'];
 
