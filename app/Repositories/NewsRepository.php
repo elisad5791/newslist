@@ -12,7 +12,7 @@ class NewsRepository
         protected PDO $pdo
     ) {}
 
-    public function getTagNews($tagId)
+    public function getTagNews(int $tagId): array
     {
         $sql = "SELECT n.id, n.title, n.created_at 
             FROM news n
@@ -27,7 +27,7 @@ class NewsRepository
         return $news;
     }
 
-    public function getTagTitle($tagId)
+    public function getTagTitle(int $tagId): string
     {
         $sql = "SELECT title FROM tags WHERE id = ?";
 
@@ -39,7 +39,7 @@ class NewsRepository
         return $title;
     }
 
-    public function getCategoryNews($categoryId)
+    public function getCategoryNews(int $categoryId): array
     {
         $sql = "SELECT id, title, created_at FROM news WHERE category_id = ? ORDER BY created_at DESC";
         $stmt = $this->pdo->prepare($sql);
@@ -49,7 +49,7 @@ class NewsRepository
         return $news;
     }
 
-    public function getCategoryTitle($categoryId)
+    public function getCategoryTitle(int $categoryId): string
     {
         $sql = "SELECT title FROM categories WHERE id = ?";
 
@@ -61,7 +61,7 @@ class NewsRepository
         return $title;
     }
 
-    public function getNewsCount()
+    public function getNewsCount(): int
     {
         $sql = "SELECT count(*) AS count FROM news";
         $stmt = $this->pdo->prepare($sql);
@@ -72,7 +72,7 @@ class NewsRepository
         return $count;
     }
 
-    public function getNewsPage($page)
+    public function getNewsPage(int $page): array
     {
         $limit = self::NEWS_FOR_PAGE;
         $offset = self::NEWS_FOR_PAGE * ($page - 1);
@@ -101,7 +101,7 @@ class NewsRepository
         return $news;
     }
 
-    public function getCategorySimilar($newsId)
+    public function getCategorySimilar(int $newsId): array
     {
         $sql = "SELECT n2.id, n2.title, n2.created_at, c.title AS category_title
             FROM news n1
@@ -117,7 +117,7 @@ class NewsRepository
         return $categorySimilar;
     }
 
-    public function getTagSimilarIds($newsId)
+    public function getTagSimilarIds(int $newsId): array
     {
         $sql = "SELECT nt2.news_id, COUNT(*) as common_tags
             FROM news_tags nt1
@@ -134,7 +134,7 @@ class NewsRepository
         return $data;
     }
 
-    public function getTagSimilar($ids)
+    public function getTagSimilar(array $ids): array
     {
         $placeholders = str_repeat('?,', count($ids) - 1) . '?';
         $orderField = 'FIELD(id, ' . str_repeat('?,', count($ids) - 1) . '?)';
@@ -149,7 +149,7 @@ class NewsRepository
         return $tagSimilar;
     }
 
-    public function getNews($newsId)
+    public function getNews(int $newsId): array
     {
         $sql = "SELECT 
                 n.id, 
@@ -174,7 +174,7 @@ class NewsRepository
         return $item;
     }
 
-    public function updateViews($data)
+    public function updateViews(array $data): void
     {
         $sql = "TRUNCATE TABLE news_views";
         $stmt = $this->pdo->prepare($sql);

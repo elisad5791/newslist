@@ -10,7 +10,7 @@ class NewsRedisHelper
         protected Redis $redis
     ) {}
 
-    public function getTagNews($tagId)
+    public function getTagNews(int $tagId): string
     {
         $cacheKey = "list:tag_$tagId";
         $news = $this->redis->get($cacheKey);
@@ -18,13 +18,13 @@ class NewsRedisHelper
         return $news;
     }
 
-    public function setTagNews($news, $tagId)
+    public function setTagNews(array $news, int $tagId): void
     {
         $cacheKey = "list:tag_$tagId";
         $this->redis->set($cacheKey, json_encode($news));
     }
 
-    public function getTagTitle($tagId)
+    public function getTagTitle(int $tagId): string
     {
         $cacheKey = "title:tag_$tagId";
         $title = $this->redis->get($cacheKey);
@@ -32,13 +32,13 @@ class NewsRedisHelper
         return $title;
     }
 
-    public function setTagTitle($tagTitle, $tagId)
+    public function setTagTitle(string $tagTitle, int $tagId): void
     {
         $cacheKey = "title:tag_$tagId";
         $this->redis->set($cacheKey, $tagTitle);
     }
 
-    public function getCategoryNews($categoryId)
+    public function getCategoryNews(int $categoryId): string
     {
         $cacheKey = "list:category_$categoryId";
         $news = $this->redis->get($cacheKey);
@@ -46,13 +46,13 @@ class NewsRedisHelper
         return $news;
     }
 
-    public function setCategoryNews($news, $categoryId)
+    public function setCategoryNews(array $news, int $categoryId): void
     {
         $cacheKey = "list:category_$categoryId";
         $this->redis->set($cacheKey, json_encode($news));
     }
 
-    public function getCategoryTitle($categoryId)
+    public function getCategoryTitle(int $categoryId): string
     {
         $cacheKey = "title:category_$categoryId";
         $title = $this->redis->get($cacheKey);
@@ -60,13 +60,13 @@ class NewsRedisHelper
         return $title;
     }
 
-    public function setCategoryTitle($categoryTitle, $categoryId)
+    public function setCategoryTitle(string $categoryTitle, int $categoryId): void
     {
         $cacheKey = "title:category_$categoryId";
         $this->redis->set($cacheKey, $categoryTitle);
     }
 
-    public function getPopular()
+    public function getPopular(): array
     {
         $popular = $this->redis->zRevRange('news:top', 0, 2, ['WITHSCORES' => true]);
         return $popular;
@@ -105,7 +105,7 @@ class NewsRedisHelper
         return $closestUsers;
     }
 
-    public function getItem($id)
+    public function getItem(int $id): string
     {
         $cacheKey = "item:news_$id";
         $item = $this->redis->get($cacheKey);
@@ -113,7 +113,7 @@ class NewsRedisHelper
         return $item;
     }
 
-    public function getNewsCount()
+    public function getNewsCount(): int
     {
         $cacheKey = 'list:count';
         $count = $this->redis->get($cacheKey);
@@ -121,13 +121,13 @@ class NewsRedisHelper
         return $count;
     }
 
-    public function setNewsCount($count)
+    public function setNewsCount(int $count): void
     {
         $cacheKey = 'list:count';
         $this->redis->set($cacheKey, $count);
     }
 
-    public function getNewsPage($page)
+    public function getNewsPage(int $page): string
     {
         $cacheKey = "list:page_$page";
         $news = $this->redis->get($cacheKey);
@@ -135,13 +135,13 @@ class NewsRedisHelper
         return $news;
     }
 
-    public function setNewsPage($news, $page)
+    public function setNewsPage(array $news, int $page): void
     {
         $cacheKey = "list:page_$page";
         $this->redis->set($cacheKey, json_encode($news));
     }
 
-    public function getViews($id)
+    public function getViews(int $id): int
     {
         $views = $this->redis->zScore('news:top', $id);
         return $views;
@@ -198,7 +198,7 @@ class NewsRedisHelper
         return $categoryIds;
     }
 
-    public function getLikeCount($newsId)
+    public function getLikeCount(int $newsId): int
     {
         $cacheKey = 'likes:news';
         $likeCount = $this->redis->hGet($cacheKey, $newsId);
@@ -209,7 +209,7 @@ class NewsRedisHelper
         return $likeCount;
     }
 
-    public function getCurrentLike($userId, $newsId)
+    public function getCurrentLike(int $userId, int $newsId): bool
     {
         $like = false;
         if (!empty($userId)) {
@@ -219,56 +219,59 @@ class NewsRedisHelper
         }
 
         return $like;
-    }
+    } 
 
-    public function getViewsCount($newsId)
+    public function getViewsCount(int $newsId): int
     {
         $viewsCount = $this->redis->zIncrBy('news:top', 1, $newsId);
         return $viewsCount;
     }
 
-    public function getCategorySimilar($newsId)
+    public function getCategorySimilar(int $newsId): array
     {
         $cacheKey = "category:similar:news_$newsId";
         $data = $this->redis->lRange($cacheKey, 0, -1);
         return $data;
     }
 
-    public function setCategorySimilar($newsId, $news)
+    public function setCategorySimilar(int $newsId, array $news): void
     {
         $cacheKey = "category:similar:news_$newsId";
         $val = json_encode($news);
         $this->redis->lPush($cacheKey, $val);
     }
 
-    public function getTagSimilar($newsId)
+    public function getTagSimilar(int $newsId): array
     {
         $cacheKey = "tag:similar:news_$newsId";
         $data = $this->redis->zRevRange($cacheKey, 0, -1);
         return $data;
     }
 
-    public function setTagSimilar($newsId, $count, $news)
+    public function setTagSimilar(int $newsId, int $count, array $news): void
     {
         $cacheKey = "tag:similar:news_$newsId";
         $val = json_encode($news);
         $this->redis->zAdd($cacheKey, $count, $val);
     }
 
-    public function getNews($newsId)
+    public function getNews(int $newsId): string
     {
         $cacheKey = "item:news_$newsId";
         $news = $this->redis->get($cacheKey);
+        if (empty($news)) {
+            $news = '';
+        }
         return $news;
     }
 
-    public function setNews($newsId, $item)
+    public function setNews(int $newsId, array $item): void
     {
         $cacheKey = "item:news_$newsId";
         $this->redis->set($cacheKey, json_encode($item));
     }
 
-    public function getViewsData()
+    public function getViewsData(): array
     {
         $key = 'news:top';
         $newsIds = $this->redis->zRange($key, 0, -1);

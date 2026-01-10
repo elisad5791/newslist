@@ -10,13 +10,13 @@ class UserRedisHelper
         protected Redis $redis
     ) {}
 
-    public function setLikesForUser($likes, $userId)
+    public function setLikesForUser(array $likes, int $userId): void
     {
         $cacheKey = "likes:user_$userId";
         $this->redis->sAdd($cacheKey, ...$likes);
     }
 
-    public function addLike($userId, $newsId)
+    public function addLike(int $userId, int $newsId): void
     {
         $cacheKey = "likes:user_$userId";
         $this->redis->sAdd($cacheKey, $newsId);
@@ -28,7 +28,7 @@ class UserRedisHelper
         $this->redis->lPush('queue_like', json_encode($action));
     }
 
-    public function removeLike($userId, $newsId)
+    public function removeLike(int $userId, int $newsId): void
     {
         $cacheKey = "likes:user_$userId";
         $this->redis->sRem($cacheKey, $newsId); 
@@ -37,7 +37,7 @@ class UserRedisHelper
         $this->redis->hIncrBy($cacheKey, $newsId, -1);
     }
 
-    public function getRequestCount($ip)
+    public function getRequestCount(string $ip): int
     {
         $key = "rate_limit:$ip";
         $now = floor(microtime(true));
@@ -51,7 +51,7 @@ class UserRedisHelper
         return $count;
     }
 
-    public function cleanDeadUsers()
+    public function cleanDeadUsers(): void
     {
         $allUsers = $this->redis->sMembers('active_users');
     
@@ -63,14 +63,14 @@ class UserRedisHelper
         }
     }
 
-    public function getOnlineCount()
+    public function getOnlineCount(): int
     {
         $setKey = 'active_users';
         $onlineCount = $this->redis->sCard($setKey); 
         return $onlineCount;
     }
 
-    public function getQueueTask()
+    public function getQueueTask(): string
     {
         $dataJson = $this->redis->brPop('queue_like', 0);
         return $dataJson;

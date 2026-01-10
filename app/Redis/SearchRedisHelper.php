@@ -30,6 +30,12 @@ class SearchRedisHelper
 
     public function addNews(array $item): void
     {
+        $allIndices = $this->redisAdapter->rawCommand('FT._LIST', []); 
+
+        if (!in_array('news_search', $allIndices)) {
+            return;
+        }
+
         $count = $this->newsIndex->tagFilter('newsid', [$item['id']])->count(); 
         $keyExists = $count > 0;
         if ($keyExists) {
@@ -47,6 +53,12 @@ class SearchRedisHelper
 
     public function getSearchNews(string $q): array
     {
+        $allIndices = $this->redisAdapter->rawCommand('FT._LIST', []); 
+
+        if (!in_array('news_search', $allIndices)) {
+            return [];
+        }
+
         $result = $this->newsIndex->search($q, true);
         $documents = $result->getDocuments(); 
         return $documents;

@@ -36,7 +36,7 @@ class UserRepository
         return $user;
     }
 
-    public function getLikes($userId)
+    public function getLikes(int $userId): array
     {
         $sql = "SELECT news_id FROM users_likes WHERE user_id = ?";
         $stmt = $this->pdo->prepare($sql);
@@ -47,7 +47,7 @@ class UserRepository
         return $likes;
     }
 
-    public function getLike($userId, $newsId)
+    public function getLike(int $userId, int $newsId): bool
     {
         $sql = "SELECT * FROM users_likes WHERE user_id = ? AND news_id = ?";
         $stmt = $this->pdo->prepare($sql);
@@ -57,21 +57,21 @@ class UserRepository
         return $like;
     }
 
-    public function addLike($userId, $newsId)
+    public function addLike(int $userId, int $newsId): void
     {
         $sql = "INSERT INTO users_likes(user_id, news_id) VALUES(?, ?)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$userId, $newsId]);
     }
 
-    public function removeLike($userId, $newsId)
+    public function removeLike(int $userId, int $newsId): void
     {
         $sql = "DELETE FROM users_likes WHERE user_id = ? AND news_id = ?";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$userId, $newsId]);
     }
 
-    public function addLog($userId, $newsId)
+    public function addLog(int $userId, int $newsId): void
     {
         $message = "User $userId add like to news $newsId";
         $sql = "INSERT INTO like_logs(message) VALUES(?)";
