@@ -40,11 +40,11 @@ class UserRedisHelper
     public function getRequestCount(string $ip): int
     {
         $key = "rate_limit:$ip";
-        $now = floor(microtime(true));
+        $now = microtime(true);
         $windowStart = $now - 60;
 
         $this->redis->zAdd($key, $now, $now);
-        $this->redis->expire($key, 61);
+        $this->redis->expire($key, 60);
         $this->redis->zRemRangeByScore($key, 0, $windowStart);
         $count = $this->redis->zCount($key, $windowStart, $now);
 
@@ -70,10 +70,10 @@ class UserRedisHelper
         return $onlineCount;
     }
 
-    public function getQueueTask(): string
+    public function getQueueTask(): array
     {
-        $dataJson = $this->redis->brPop('queue_like', 0);
-        return $dataJson;
+        $data = $this->redis->brPop('queue_like', 0);
+        return $data;
     }
 
     public function trackUserActivity(int $userId, float $lat, float $lon): void
@@ -99,7 +99,7 @@ class UserRedisHelper
     {
         $key = "user:day:active";
         $ttl = 24 * 60 * 60;
-        $now = floor(microtime(true));
+        $now = time();
         $windowStart = $now - $ttl;
 
         $this->redis->zAdd($key, $now, $userId);
@@ -118,7 +118,7 @@ class UserRedisHelper
     {
         $key = "user:day:active";
         $ttl = 24 * 60 * 60;
-        $now = floor(microtime(true));
+        $now = time();
         $windowStart = $now - $ttl;
 
         $this->redis->zRemRangeByScore($key, 0, $windowStart);
@@ -132,12 +132,12 @@ class UserRedisHelper
     {
         $key = "user:day:active";
         $window = 60 * 60;
-        $now = floor(microtime(true));
+        $now = time();
         $windowStart = $now - $window;
 
-        $this->redis->zRemRangeByScore($key, 0, $windowStart);
-        
-        $count = $this->redis->zCount($key, $windowStart, $now);
+        $users = $this->redis->zRangeByScore($key, $windowStart, $now);
+        $count = count($users);
+
         return $count;
     }
 }
