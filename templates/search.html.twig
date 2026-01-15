@@ -7,7 +7,7 @@
 <body>
 
 <header>
-    <h1>Поиск</h1>
+    <h1>Search</h1>
     <div class="login">
         {% if is_admin %}
             <a href="/statistics" class="login-link">Statistics</a>
@@ -16,19 +16,19 @@
         {% if username %}
             <span>{{ username }}</span>
         {% else %}
-            <a href="/auth" class="login-link">Войти</a>
+            <a href="/auth" class="login-link">Login</a>
         {% endif %}
     </div>
 </header>
 
 <div class="back-link">
-    <a href="/">← Назад к списку новостей</a>
+    <a href="/">← Back</a>
 </div>
 
 <div class="search-container">
     <form class="search-form" method="get" action="/search">
         <input type="text" name="q" class="search-input" placeholder="Поиск по новостям" value="{{ q }}">
-        <button type="submit" class="search-btn">Найти</button>
+        <button type="submit" class="search-btn">Login</button>
     </form>
 
     {% if news %}
